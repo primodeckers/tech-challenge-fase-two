@@ -1,0 +1,47 @@
+# Material de referência do curso (não versionar)
+referencia/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Variáveis de ambiente / segredos
+.env
+.env.*
+!.env.example
+
+# Ferramentas
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Dados e modelos (versionados via DVC, não via Git)
+data/
+models/
+!data/.gitkeep
+!models/.gitkeep
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC
+/tmp
+
+# IDE / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
