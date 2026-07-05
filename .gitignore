@@ -27,9 +27,12 @@ env/
 htmlcov/
 
 # Dados e modelos (versionados via DVC, não via Git)
-data/
-models/
-!data/.gitkeep
+data/*
+models/*
+!data/raw
+!data/raw/.gitkeep
+!data/processed
+!data/processed/.gitkeep
 !models/.gitkeep
 
 # MLflow

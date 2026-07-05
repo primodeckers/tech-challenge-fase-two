@@ -1,0 +1,39 @@
+[project]
+name = "recomendador-ecommerce"
+version = "0.1.0"
+description = "Sistema de recomendação de produtos e-commerce com PyTorch, DVC e MLflow"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "dvc[all]>=3.67.1",
+    "mlflow>=3.14.0",
+    "numpy>=2.4.6",
+    "pandas>=2.3.3",
+    "pydantic-settings>=2.14.2",
+    "scikit-learn>=1.9.0",
+    "torch>=2.12.1",
+]
+
+[project.scripts]
+treinar = "src.cli:treinar"
+validar-env = "scripts.validate_env:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.0",
+    "pytest>=9.1.1",
+    "ruff>=0.15.20",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src", "scripts"]
