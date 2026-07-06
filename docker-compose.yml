@@ -1,0 +1,45 @@
+services:
+  # Servidor de rastreamento de experimentos e Model Registry
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.14.0
+    container_name: mlflow-server
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Serviço de treino: roda o pipeline e registra no MLflow
+  train:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: recomendador:0.1.0
+    container_name: recomendador-train
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_EXPERIMENT_NAME: recomendador-ecommerce
+      RAW_DATA_PATH: data/raw/events.csv
+      PROCESSED_DATA_DIR: data/processed
+      MODEL_OUTPUT_DIR: models
+      RANDOM_SEED: "42"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+
+volumes:
+  mlflow-data:
