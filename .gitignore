@@ -26,21 +26,15 @@ env/
 .coverage
 htmlcov/
 
-# Dados e modelos (versionados via DVC, não via Git)
-data/*
-models/*
-!data/raw
-!data/raw/.gitkeep
-!data/processed
-!data/processed/.gitkeep
-!models/.gitkeep
+# Dados e modelos: o conteúdo é versionado via DVC (não via Git).
+# O próprio DVC gera os .gitignore internos em data/ e models/ ao rastrear
+# arquivos (dvc add) e saídas de pipeline (dvc.yaml). Aqui mantemos apenas
+# os placeholders das pastas que ficam vazias no Git.
 
 # MLflow
 mlruns/
 mlartifacts/
-
-# DVC
-/tmp
+*.db
 
 # IDE / SO
 .vscode/
