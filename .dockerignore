@@ -1,0 +1,41 @@
+# Controle de versão
+.git
+.gitignore
+
+# Material de referência do curso
+referencia/
+
+# Ambiente virtual e caches Python
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Dados e modelos (montados via volume / versionados com DVC)
+data/
+models/
+mlruns/
+mlartifacts/
+*.db
+
+# Segredos e config local
+.env
+.env.*
+!.env.example
+
+# Notebooks e artefatos de exploração
+*.ipynb
+notebooks/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml

@@ -17,6 +17,16 @@ dependencies = [
 treinar = "src.cli:treinar"
 validar-env = "scripts.validate_env:main"
 
+# Usa torch CPU-only: o projeto (recomendação com dataset pequeno) não precisa
+# de GPU, e isso reduz a imagem Docker de ~9 GB (CUDA embutido) para ~centenas de MB.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
