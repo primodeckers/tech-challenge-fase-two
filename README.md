@@ -6,7 +6,7 @@ Sistema de recomendação de produtos para e-commerce baseado no comportamento d
 
 ## Status
 
-🚧 Em desenvolvimento — Etapa 1 concluída (estrutura, clean code, ambiente reprodutível). Próxima: Etapa 2 (Docker).
+🚧 Em desenvolvimento — Etapas 1 e 2 concluídas (estrutura + clean code + ambiente reprodutível; containerização Docker). Próxima: Etapa 3 (pipeline DVC + rede neural).
 
 ## Stack
 
@@ -43,3 +43,18 @@ uv run treinar           # treina o modelo (requer dataset em data/raw/, ver Eta
 ```
 
 Copie `.env.example` para `.env` e ajuste conforme necessário.
+
+## Docker
+
+A imagem é construída em **multi-stage** (estágio de build resolve dependências com uv; estágio de runtime é enxuto e roda como usuário não-root `mluser`). O `docker-compose.yml` orquestra dois serviços:
+
+- **`mlflow`** — servidor de tracking e Model Registry (UI em http://localhost:5000)
+- **`train`** — executa o pipeline de treino, registrando no servidor MLflow
+
+```bash
+docker compose up mlflow          # sobe só o servidor MLflow (UI em :5000)
+docker compose up --build train   # constrói e roda o treino (requer dataset, ver Etapa 3)
+docker compose down               # encerra os serviços
+```
+
+> A imagem usa `torch` CPU-only (o projeto não requer GPU), o que a mantém enxuta.
