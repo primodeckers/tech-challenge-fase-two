@@ -8,7 +8,10 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    mlflow_tracking_uri: str = "http://localhost:5000"
+    # Por padrão, registra os experimentos localmente em SQLite, de modo que o
+    # pipeline roda sem depender do servidor e já suporta o Model Registry. Para
+    # usar o servidor central, aponte para http://localhost:5000 via ambiente.
+    mlflow_tracking_uri: str = "sqlite:///mlflow.db"
     mlflow_experiment_name: str = "recomendador-ecommerce"
 
     raw_data_path: Path = Path("data/raw/events.csv")

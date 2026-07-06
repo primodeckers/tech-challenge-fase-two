@@ -1,9 +1,15 @@
+import copy
+from collections.abc import Callable
+
 import numpy as np
 import pandas as pd
 import torch
 from torch import nn
 
 from src.models.base import BaseRecommender
+
+# Callback chamado ao fim de cada época: (época, loss_treino, loss_validação).
+EpochCallback = Callable[[int, float, float], None]
 
 
 class _EmbeddingMLP(nn.Module):
@@ -28,7 +34,11 @@ class _EmbeddingMLP(nn.Module):
 
 
 class MLPRecommender(BaseRecommender):
-    """Recomendador neural com embeddings de usuário/item, treino via negative sampling."""
+    """Recomendador neural com embeddings de usuário/item.
+
+    Treina em mini-batches com amostragem negativa (reamostrada a cada época) e
+    faz early stopping pela perda de validação, restaurando o melhor estado.
+    """
 
     def __init__(
         self,
@@ -38,35 +48,55 @@ class MLPRecommender(BaseRecommender):
         learning_rate: float = 1e-3,
         epochs: int = 20,
         patience: int = 3,
+        negative_ratio: int = 1,
+        batch_size: int = 2048,
         seed: int = 42,
     ) -> None:
         torch.manual_seed(seed)
         self._model = _EmbeddingMLP(n_users, n_items, embedding_dim)
+        self._n_items = n_items
         self._learning_rate = learning_rate
         self._epochs = epochs
         self._patience = patience
+        self._negative_ratio = negative_ratio
+        self._batch_size = batch_size
         self._rng = np.random.default_rng(seed)
 
-    def fit(self, interactions: pd.DataFrame) -> "MLPRecommender":
-        """Treina com amostragem negativa e early stopping em cima da loss de treino.
-
-        Espera colunas 'user_idx' e 'item_idx' (índices contíguos já codificados).
-        """
-        user_idx, item_idx, label = self._build_training_tensors(interactions)
+    def fit(
+        self,
+        interactions: pd.DataFrame,
+        val_interactions: pd.DataFrame | None = None,
+        epoch_callback: EpochCallback | None = None,
+    ) -> "MLPRecommender":
+        """Treina o modelo. Espera colunas 'user_idx' e 'item_idx'."""
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self._learning_rate)
         loss_fn = nn.BCELoss()
+        val_tensors = (
+            self._build_tensors(val_interactions) if val_interactions is not None else None
+        )
 
-        best_loss = float("inf")
+        best_val_loss = float("inf")
+        best_state = copy.deepcopy(self._model.state_dict())
         epochs_without_improvement = 0
-        self._model.train()
-        for _ in range(self._epochs):
-            loss = self._train_one_epoch(optimizer, loss_fn, user_idx, item_idx, label)
-            if loss < best_loss:
-                best_loss, epochs_without_improvement = loss, 0
+
+        for epoch in range(self._epochs):
+            train_loss = self._train_one_epoch(optimizer, loss_fn, interactions)
+            val_loss = (
+                self._compute_loss(loss_fn, val_tensors) if val_tensors is not None else train_loss
+            )
+            if epoch_callback is not None:
+                epoch_callback(epoch, train_loss, val_loss)
+
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_state = copy.deepcopy(self._model.state_dict())
+                epochs_without_improvement = 0
             else:
                 epochs_without_improvement += 1
-            if epochs_without_improvement >= self._patience:
-                break
+                if epochs_without_improvement >= self._patience:
+                    break
+
+        self._model.load_state_dict(best_state)
         return self
 
     def predict(self, user_ids: pd.Series, item_ids: pd.Series) -> pd.Series:
@@ -77,22 +107,42 @@ class MLPRecommender(BaseRecommender):
             scores = self._model(user_idx, item_idx)
         return pd.Series(scores.numpy(), index=user_ids.index)
 
+    @property
+    def state_dict(self) -> dict:
+        return self._model.state_dict()
+
     def _train_one_epoch(
         self,
         optimizer: torch.optim.Optimizer,
         loss_fn: nn.Module,
-        user_idx: torch.Tensor,
-        item_idx: torch.Tensor,
-        label: torch.Tensor,
+        interactions: pd.DataFrame,
     ) -> float:
-        optimizer.zero_grad()
-        predictions = self._model(user_idx, item_idx)
-        loss = loss_fn(predictions, label)
-        loss.backward()
-        optimizer.step()
-        return loss.item()
+        user_idx, item_idx, label = self._build_tensors(interactions)
+        permutation = torch.randperm(len(label))
+        self._model.train()
 
-    def _build_training_tensors(
+        total_loss, n_batches = 0.0, 0
+        for start in range(0, len(label), self._batch_size):
+            batch = permutation[start : start + self._batch_size]
+            optimizer.zero_grad()
+            predictions = self._model(user_idx[batch], item_idx[batch])
+            loss = loss_fn(predictions, label[batch])
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+            n_batches += 1
+        return total_loss / n_batches
+
+    def _compute_loss(
+        self, loss_fn: nn.Module, tensors: tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    ) -> float:
+        user_idx, item_idx, label = tensors
+        self._model.eval()
+        with torch.no_grad():
+            predictions = self._model(user_idx, item_idx)
+            return loss_fn(predictions, label).item()
+
+    def _build_tensors(
         self, interactions: pd.DataFrame
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         positives = interactions[["user_idx", "item_idx"]].copy()
@@ -105,8 +155,7 @@ class MLPRecommender(BaseRecommender):
         return user_idx, item_idx, label
 
     def _sample_negatives(self, positives: pd.DataFrame) -> pd.DataFrame:
-        n_items = self._model.item_embedding.num_embeddings
-        negatives = positives.copy()
-        negatives["item_idx"] = self._rng.integers(0, n_items, size=len(positives))
+        negatives = positives.loc[positives.index.repeat(self._negative_ratio)].copy()
+        negatives["item_idx"] = self._rng.integers(0, self._n_items, size=len(negatives))
         negatives["label"] = 0.0
         return negatives

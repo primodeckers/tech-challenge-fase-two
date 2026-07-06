@@ -1,1 +1,5 @@
 /interactions.parquet
+/train.parquet
+/val.parquet
+/test.parquet
+/metadata.json

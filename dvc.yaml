@@ -24,3 +24,18 @@ stages:
       - data/processed/val.parquet
       - data/processed/test.parquet
       - data/processed/metadata.json
+
+  train:
+    cmd: python -m src.pipeline.train
+    deps:
+      - src/pipeline/train.py
+      - src/models/neural.py
+      - src/models/factory.py
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/metadata.json
+    params:
+      - configs/params.yaml:
+          - train
+    outs:
+      - models/model.pt

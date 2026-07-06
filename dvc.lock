@@ -69,3 +69,43 @@ stages:
       hash: md5
       md5: a1be51775695ee5c8914a1565c418f4e
       size: 1356985
+  train:
+    cmd: python -m src.pipeline.train
+    deps:
+    - path: data/processed/metadata.json
+      hash: md5
+      md5: c3f2a419c81a0aa5917c8a82993c8103
+      size: 45
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: dee1aee57cdef6b3d11026254d1a5336
+      size: 6962639
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: a1be51775695ee5c8914a1565c418f4e
+      size: 1356985
+    - path: src/models/factory.py
+      hash: md5
+      md5: ed2a289d4c76c10e693adfb74c24b252
+      size: 721
+    - path: src/models/neural.py
+      hash: md5
+      md5: e0ec40269d9e2df54edcaa1322b380fa
+      size: 6090
+    - path: src/pipeline/train.py
+      hash: md5
+      md5: 8c141bbe9f59b7020b4516c3cb2af6ec
+      size: 1942
+    params:
+      configs/params.yaml:
+        train:
+          embedding_dim: 32
+          learning_rate: 0.001
+          epochs: 20
+          patience: 3
+          negative_ratio: 1
+    outs:
+    - path: models/model.pt
+      hash: md5
+      md5: 3b55b03be5a4733d3f5f4b6850039fc8
+      size: 18138621
