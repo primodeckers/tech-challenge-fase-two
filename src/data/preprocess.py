@@ -1,11 +1,20 @@
 import pandas as pd
 
 
-def preprocess_data(raw_data: pd.DataFrame, min_interactions: int = 5) -> pd.DataFrame:
+def filter_positive_events(data: pd.DataFrame, positive_events: list[str]) -> pd.DataFrame:
+    """Mantém apenas eventos que representam sinal positivo (feedback implícito)."""
+    return data[data["event"].isin(positive_events)]
+
+
+def preprocess_data(
+    raw_data: pd.DataFrame,
+    min_user_interactions: int = 5,
+    min_item_interactions: int = 5,
+) -> pd.DataFrame:
     """Remove duplicatas e filtra usuários/itens com poucas interações."""
     processed_data = raw_data.drop_duplicates(subset=["user_id", "item_id", "timestamp"])
-    processed_data = _filter_by_min_interactions(processed_data, "user_id", min_interactions)
-    processed_data = _filter_by_min_interactions(processed_data, "item_id", min_interactions)
+    processed_data = _filter_by_min_interactions(processed_data, "item_id", min_item_interactions)
+    processed_data = _filter_by_min_interactions(processed_data, "user_id", min_user_interactions)
     return processed_data.reset_index(drop=True)
 
 

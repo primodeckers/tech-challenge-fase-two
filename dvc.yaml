@@ -1,0 +1,13 @@
+stages:
+  preprocess:
+    cmd: python -m src.pipeline.preprocess
+    deps:
+      - src/pipeline/preprocess.py
+      - src/data/loader.py
+      - src/data/preprocess.py
+      - data/raw/events.csv
+    params:
+      - configs/params.yaml:
+          - preprocess
+    outs:
+      - data/processed/interactions.parquet

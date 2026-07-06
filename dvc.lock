@@ -1,0 +1,37 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python -m src.pipeline.preprocess
+    deps:
+    - path: data/raw/events.csv
+      hash: md5
+      md5: fddaf7c1c6a9df23a726500a08ffdd7e
+      size: 94237913
+    - path: src/data/loader.py
+      hash: md5
+      md5: d6b636a850a9a03ebb2c9201049e81cb
+      size: 543
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: 8ea5695a107571f2e4178e4f51c288fe
+      size: 1076
+    - path: src/pipeline/preprocess.py
+      hash: md5
+      md5: 0438812fdf36d08b4cc2703991ebd8f2
+      size: 1143
+    params:
+      configs/params.yaml:
+        preprocess:
+          positive_events:
+          - view
+          - addtocart
+          - transaction
+          min_user_interactions: 5
+          min_item_interactions: 5
+          val_fraction: 0.1
+          test_fraction: 0.1
+    outs:
+    - path: data/processed/interactions.parquet
+      hash: md5
+      md5: 7f7ed0b938fd7bf7b06728ec86105fec
+      size: 9477190

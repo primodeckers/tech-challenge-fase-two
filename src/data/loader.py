@@ -2,10 +2,15 @@ from pathlib import Path
 
 import pandas as pd
 
+# Mapeia as colunas originais do RetailRocket para o vocabulário do projeto.
+_RETAILROCKET_COLUMNS = {"visitorid": "user_id", "itemid": "item_id"}
+
 
 def load_data(path: Path) -> pd.DataFrame:
-    """Carrega interações user-item de um CSV.
+    """Carrega os eventos do RetailRocket e padroniza os nomes das colunas.
 
-    Espera colunas: user_id, item_id, event, timestamp.
+    Retorna colunas: user_id, item_id, event, timestamp.
     """
-    return pd.read_csv(path)
+    raw_data = pd.read_csv(path)
+    raw_data = raw_data.rename(columns=_RETAILROCKET_COLUMNS)
+    return raw_data[["user_id", "item_id", "event", "timestamp"]]
