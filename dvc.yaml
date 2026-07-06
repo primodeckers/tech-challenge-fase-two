@@ -11,3 +11,16 @@ stages:
           - preprocess
     outs:
       - data/processed/interactions.parquet
+
+  featurize:
+    cmd: python -m src.pipeline.featurize
+    deps:
+      - src/pipeline/featurize.py
+      - src/features/encoding.py
+      - src/features/split.py
+      - data/processed/interactions.parquet
+    outs:
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+      - data/processed/metadata.json

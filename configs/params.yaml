@@ -7,17 +7,17 @@ preprocess:
   # Mantém apenas usuários/itens com pelo menos N interações (densifica o dataset)
   min_user_interactions: 5
   min_item_interactions: 5
-  # Fração final para validação e teste (split temporal)
-  val_fraction: 0.1
-  test_fraction: 0.1
 
 train:
   embedding_dim: 32
   learning_rate: 0.001
   epochs: 20
   patience: 3
+  # Nº de itens negativos amostrados por positivo no treino
   negative_ratio: 1
 
 evaluate:
   # Corte do ranking para as métricas @k
   k: 10
+  # Nº de negativos usados para ranquear o item positivo de cada usuário (protocolo NCF)
+  num_eval_negatives: 99

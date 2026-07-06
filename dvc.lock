@@ -13,8 +13,8 @@ stages:
       size: 543
     - path: src/data/preprocess.py
       hash: md5
-      md5: 8ea5695a107571f2e4178e4f51c288fe
-      size: 1076
+      md5: e29f1045104a7ff2d2e3b4412dae97b5
+      size: 1048
     - path: src/pipeline/preprocess.py
       hash: md5
       md5: 0438812fdf36d08b4cc2703991ebd8f2
@@ -28,10 +28,44 @@ stages:
           - transaction
           min_user_interactions: 5
           min_item_interactions: 5
-          val_fraction: 0.1
-          test_fraction: 0.1
     outs:
     - path: data/processed/interactions.parquet
       hash: md5
       md5: 7f7ed0b938fd7bf7b06728ec86105fec
       size: 9477190
+  featurize:
+    cmd: python -m src.pipeline.featurize
+    deps:
+    - path: data/processed/interactions.parquet
+      hash: md5
+      md5: 7f7ed0b938fd7bf7b06728ec86105fec
+      size: 9477190
+    - path: src/features/encoding.py
+      hash: md5
+      md5: 185938323f42d57f0b6a41971b4b614a
+      size: 568
+    - path: src/features/split.py
+      hash: md5
+      md5: 1dce38fd58486fadb3c697dc0d130056
+      size: 743
+    - path: src/pipeline/featurize.py
+      hash: md5
+      md5: ca35382860a3ca0ea29744b509f99bc4
+      size: 1467
+    outs:
+    - path: data/processed/metadata.json
+      hash: md5
+      md5: c3f2a419c81a0aa5917c8a82993c8103
+      size: 45
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 49956f960e3fa19023e2278f0524d7e8
+      size: 1360675
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: dee1aee57cdef6b3d11026254d1a5336
+      size: 6962639
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: a1be51775695ee5c8914a1565c418f4e
+      size: 1356985
