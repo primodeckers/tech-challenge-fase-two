@@ -6,7 +6,11 @@ Sistema de recomendação de produtos para e-commerce baseado no comportamento d
 
 ## Status
 
-🚧 Em desenvolvimento — Etapas 1 e 2 concluídas (estrutura + clean code + ambiente reprodutível; containerização Docker). Próxima: Etapa 3 (pipeline DVC + rede neural).
+🚧 Em desenvolvimento — Etapas 1, 2 e 3 concluídas (estrutura + clean code; Docker; pipeline DVC de 4 estágios + rede neural avaliada). Próxima: Etapa 4 (MLflow Registry, Model Card, vídeo).
+
+## Dataset
+
+[**RetailRocket**](https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset) — eventos de e-commerce (`view` / `addtocart` / `transaction`). Após a limpeza, ~878k interações (75,8k usuários, 65,7k itens). O `events.csv` é versionado com DVC (não vai para o Git); baixe-o do Kaggle e coloque em `data/raw/events.csv`.
 
 ## Stack
 
@@ -21,17 +25,47 @@ Sistema de recomendação de produtos para e-commerce baseado no comportamento d
 
 ```
 src/
-  config/settings.py      # configuração via Pydantic Settings (.env)
+  config/                  # Pydantic Settings (.env) e loader de params (params.yaml)
   data/                    # load_data() e preprocess_data()
-  features/                # encoding de IDs user/item
+  features/                # encoding de IDs e split leave-one-out
   models/                  # BaseRecommender (contrato), PopularityRecommender
                             # (baseline), MLPRecommender (rede neural)
   models/factory.py        # ModelFactory — padrão de projeto Factory Method
   training/trainer.py      # ModelTrainer — orquestra o treino
   evaluation/evaluator.py  # RankingEvaluator — precision/recall/ndcg/hit_rate @k
+  pipeline/                # estágios do DVC: preprocess, featurize, train, evaluate
+configs/params.yaml        # hiperparâmetros (fonte única de config)
 scripts/validate_env.py    # valida configuração antes de rodar o pipeline
 tests/                     # testes unitários (pytest)
 ```
+
+## Pipeline DVC
+
+O pipeline (`dvc.yaml`) tem quatro estágios encadeados, reexecutados de forma
+incremental (só o que muda) com `dvc repro`:
+
+| Estágio | Entrada → Saída | O que faz |
+|---|---|---|
+| `preprocess` | `events.csv` → `interactions.parquet` | limpa e filtra interações |
+| `featurize` | `interactions` → `train/val/test.parquet` | codifica IDs e split leave-one-out |
+| `train` | splits → `model.pt` | treina a rede neural (log no MLflow) |
+| `evaluate` | `model.pt` + teste → `metrics.json` | métricas de ranking @k |
+
+```bash
+dvc repro                 # executa o pipeline completo (ou só o que mudou)
+dvc metrics show          # mostra as métricas do último run
+```
+
+### Resultados (@10, protocolo NCF: 1 positivo vs 99 negativos)
+
+| Métrica | MLP (rede neural) | Baseline (popularidade) |
+|---|---|---|
+| HitRate@10 | **0.479** | 0.447 |
+| NDCG@10 | **0.274** | 0.259 |
+| Precision@10 | **0.048** | 0.045 |
+| Recall@10 | **0.479** | 0.447 |
+
+A rede neural supera o baseline em todas as métricas.
 
 ## Como executar
 
@@ -39,7 +73,7 @@ tests/                     # testes unitários (pytest)
 uv sync                  # instala dependências e cria o ambiente virtual
 uv run validar-env       # valida configuração (.env)
 uv run pytest            # roda os testes
-uv run treinar           # treina o modelo (requer dataset em data/raw/, ver Etapa 3)
+dvc repro                # executa o pipeline completo (preprocess → evaluate)
 ```
 
 Copie `.env.example` para `.env` e ajuste conforme necessário.
