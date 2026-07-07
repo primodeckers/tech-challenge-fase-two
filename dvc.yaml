@@ -39,3 +39,22 @@ stages:
           - train
     outs:
       - models/model.pt
+      - models/run_id.txt
+
+  evaluate:
+    cmd: python -m src.pipeline.evaluate
+    deps:
+      - src/pipeline/evaluate.py
+      - src/evaluation/evaluator.py
+      - src/models/neural.py
+      - src/models/baselines.py
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+      - data/processed/metadata.json
+      - models/model.pt
+    params:
+      - configs/params.yaml:
+          - evaluate
+    metrics:
+      - metrics/metrics.json:
+          cache: false

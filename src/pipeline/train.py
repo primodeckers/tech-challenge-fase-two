@@ -20,7 +20,7 @@ def main() -> None:
     mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
     mlflow.set_experiment(settings.mlflow_experiment_name)
 
-    with mlflow.start_run(run_name="mlp"):
+    with mlflow.start_run(run_name="mlp") as run:
         mlflow.set_tag("model_type", "mlp")
         mlflow.log_params(train_params)
         mlflow.log_params({"n_users": metadata["n_users"], "n_items": metadata["n_items"]})
@@ -42,7 +42,11 @@ def main() -> None:
         model_path = settings.model_output_dir / "model.pt"
         torch.save(model.state_dict, model_path)
         mlflow.log_artifact(str(model_path))
-        print(f"Modelo treinado salvo em {model_path}")
+
+        # Guarda o run_id para o stage de avaliação registrar as métricas de
+        # teste no MESMO run (linhagem: curva de loss + métricas finais juntas).
+        (settings.model_output_dir / "run_id.txt").write_text(run.info.run_id)
+        print(f"Modelo treinado salvo em {model_path} (run {run.info.run_id})")
 
 
 def _log_epoch(epoch: int, train_loss: float, val_loss: float) -> None:

@@ -103,13 +103,23 @@ class MLPRecommender(BaseRecommender):
         user_idx = torch.tensor(user_ids.to_numpy(), dtype=torch.long)
         item_idx = torch.tensor(item_ids.to_numpy(), dtype=torch.long)
         self._model.eval()
+        chunk = self._batch_size * 8
+        scores: list[np.ndarray] = []
         with torch.no_grad():
-            scores = self._model(user_idx, item_idx)
-        return pd.Series(scores.numpy(), index=user_ids.index)
+            for start in range(0, len(user_idx), chunk):
+                end = start + chunk
+                batch_scores = self._model(user_idx[start:end], item_idx[start:end])
+                scores.append(batch_scores.numpy())
+        return pd.Series(np.concatenate(scores) if scores else [], index=user_ids.index)
 
     @property
     def state_dict(self) -> dict:
         return self._model.state_dict()
+
+    def load_state(self, state_dict: dict) -> "MLPRecommender":
+        """Carrega pesos previamente treinados na rede."""
+        self._model.load_state_dict(state_dict)
+        return self
 
     def _train_one_epoch(
         self,
