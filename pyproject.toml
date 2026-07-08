@@ -16,6 +16,7 @@ dependencies = [
 [project.scripts]
 treinar = "src.cli:treinar"
 validar-env = "scripts.validate_env:main"
+experimento = "src.pipeline.experiment:main"
 
 # Usa torch CPU-only: o projeto (recomendação com dataset pequeno) não precisa
 # de GPU, e isso reduz a imagem Docker de ~9 GB (CUDA embutido) para ~centenas de MB.
