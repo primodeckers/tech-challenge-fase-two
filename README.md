@@ -6,7 +6,9 @@ Sistema de recomendação de produtos para e-commerce baseado no comportamento d
 
 ## Status
 
-🚧 Em desenvolvimento — Etapas 1, 2 e 3 concluídas (estrutura + clean code; Docker; pipeline DVC de 4 estágios + rede neural avaliada). Próxima: Etapa 4 (MLflow Registry, Model Card, vídeo).
+🚧 Em desenvolvimento — Etapas 1–4 quase completas: estrutura + clean code; Docker;
+pipeline DVC de 4 estágios + rede neural avaliada; MLflow com múltiplos runs, Model
+Registry (melhor modelo em produção) e [Model Card](MODEL_CARD.md). Pendente: vídeo.
 
 ## Dataset
 
@@ -66,6 +68,24 @@ dvc metrics show          # mostra as métricas do último run
 | Recall@10 | **0.479** | 0.447 |
 
 A rede neural supera o baseline em todas as métricas.
+
+## Experimentos e Model Registry (MLflow)
+
+O pipeline registra cada treino no MLflow (parâmetros, curva de perda e métricas
+de teste no mesmo run). Além do run canônico do `dvc repro`, há um runner de
+experimentos que compara múltiplas configurações e promove a melhor a produção:
+
+```bash
+uv run experimento        # treina embeddings 16/32/64, compara e promove a melhor
+mlflow ui --backend-store-uri sqlite:///mlflow.db   # UI em http://localhost:5000
+```
+
+- **≥3 runs comparáveis** no experimento `recomendador-ecommerce`.
+- **Model Registry:** cada configuração vira uma versão de `RecomendadorEcommerce`;
+  a melhor (por NDCG@10 — embeddings 64) recebe o alias **`@production`**.
+- Carregar o modelo de produção: `models:/RecomendadorEcommerce@production`.
+
+Veja o [Model Card](MODEL_CARD.md) para detalhes do modelo, dados, resultados e limitações.
 
 ## Como executar
 
