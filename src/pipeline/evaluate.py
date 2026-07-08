@@ -4,14 +4,13 @@ import json
 from pathlib import Path
 
 import mlflow
-import numpy as np
 import pandas as pd
 import torch
 
 from src.config.params import load_params
 from src.config.settings import settings
 from src.evaluation.evaluator import RankingEvaluator
-from src.models.base import BaseRecommender
+from src.evaluation.protocol import build_candidates, score_candidates
 from src.models.baselines import PopularityRecommender
 from src.models.neural import MLPRecommender
 
@@ -27,7 +26,7 @@ def main() -> None:
     test_data = pd.read_parquet(processed_dir / "test.parquet")
     metadata = json.loads((processed_dir / "metadata.json").read_text())
 
-    candidates = _build_candidates(
+    candidates = build_candidates(
         test_data, metadata["n_items"], eval_params["num_eval_negatives"], settings.random_seed
     )
     evaluator = RankingEvaluator(eval_params["k"])
@@ -36,30 +35,12 @@ def main() -> None:
     baseline = PopularityRecommender().fit(train_data.rename(columns={"item_idx": "item_id"}))
 
     metrics = {
-        "mlp": evaluator.evaluate(_score(candidates, mlp)),
-        "baseline_popularity": evaluator.evaluate(_score(candidates, baseline)),
+        "mlp": evaluator.evaluate(score_candidates(candidates, mlp)),
+        "baseline_popularity": evaluator.evaluate(score_candidates(candidates, baseline)),
     }
     _save_metrics(metrics)
     _log_to_mlflow(metrics)
     _print_summary(metrics, eval_params["k"])
-
-
-def _build_candidates(
-    test_data: pd.DataFrame, n_items: int, num_negatives: int, seed: int
-) -> pd.DataFrame:
-    rng = np.random.default_rng(seed)
-    positives = test_data[["user_idx", "item_idx"]].copy()
-    positives["relevant"] = 1
-
-    sampled_users = np.repeat(test_data["user_idx"].to_numpy(), num_negatives)
-    negatives = pd.DataFrame(
-        {
-            "user_idx": sampled_users,
-            "item_idx": rng.integers(0, n_items, size=len(sampled_users)),
-            "relevant": 0,
-        }
-    )
-    return pd.concat([positives, negatives], ignore_index=True)
 
 
 def _load_mlp(metadata: dict, embedding_dim: int) -> MLPRecommender:
@@ -68,13 +49,6 @@ def _load_mlp(metadata: dict, embedding_dim: int) -> MLPRecommender:
     )
     state_dict = torch.load(settings.model_output_dir / "model.pt")
     return model.load_state(state_dict)
-
-
-def _score(candidates: pd.DataFrame, model: BaseRecommender) -> pd.DataFrame:
-    scores = model.predict(candidates["user_idx"], candidates["item_idx"])
-    return pd.DataFrame(
-        {"user_id": candidates["user_idx"], "score": scores, "relevant": candidates["relevant"]}
-    )
 
 
 def _save_metrics(metrics: dict) -> None:

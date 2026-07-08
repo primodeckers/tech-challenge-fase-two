@@ -90,8 +90,8 @@ stages:
       size: 721
     - path: src/models/neural.py
       hash: md5
-      md5: d14b12cffae81933f337d53522b25368
-      size: 6528
+      md5: 2b9345131196caba7bf90680968649c8
+      size: 6694
     - path: src/pipeline/train.py
       hash: md5
       md5: 795ae76ea2b9c869d5e2689d73a26d12
@@ -111,7 +111,7 @@ stages:
       size: 18138621
     - path: models/run_id.txt
       hash: md5
-      md5: f3067258e34b5e9c232d6467b914f4c4
+      md5: 524dc748fe9aba07fb7b0a2681b8cdbc
       size: 32
   evaluate:
     cmd: python -m src.pipeline.evaluate
@@ -136,18 +136,22 @@ stages:
       hash: md5
       md5: b432ebddcc259b694e62a974ba8ea2a3
       size: 1377
+    - path: src/evaluation/protocol.py
+      hash: md5
+      md5: 5a5f49cf11b6cf22e889a771a4d50d1c
+      size: 1224
     - path: src/models/baselines.py
       hash: md5
       md5: 310891169fbbf4e4aa2d8a797a09b58f
       size: 736
     - path: src/models/neural.py
       hash: md5
-      md5: d14b12cffae81933f337d53522b25368
-      size: 6528
+      md5: 2b9345131196caba7bf90680968649c8
+      size: 6694
     - path: src/pipeline/evaluate.py
       hash: md5
-      md5: 3da0e471e002916c6eafe7b34566a9bb
-      size: 3585
+      md5: 2bfd94ad1cd0ac6e0d06e2080e039469
+      size: 2744
     params:
       configs/params.yaml:
         evaluate:

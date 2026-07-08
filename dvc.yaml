@@ -46,6 +46,7 @@ stages:
     deps:
       - src/pipeline/evaluate.py
       - src/evaluation/evaluator.py
+      - src/evaluation/protocol.py
       - src/models/neural.py
       - src/models/baselines.py
       - data/processed/train.parquet

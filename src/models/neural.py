@@ -116,6 +116,11 @@ class MLPRecommender(BaseRecommender):
     def state_dict(self) -> dict:
         return self._model.state_dict()
 
+    @property
+    def torch_module(self) -> nn.Module:
+        """Expõe o módulo PyTorch subjacente (ex.: para registrar no MLflow)."""
+        return self._model
+
     def load_state(self, state_dict: dict) -> "MLPRecommender":
         """Carrega pesos previamente treinados na rede."""
         self._model.load_state_dict(state_dict)

@@ -1,12 +1,12 @@
 import pandas as pd
 
-from src.pipeline.evaluate import _build_candidates
+from src.evaluation.protocol import build_candidates
 
 
 def test_build_candidates_has_one_positive_and_n_negatives_per_user():
     test_data = pd.DataFrame({"user_idx": [0, 1], "item_idx": [5, 7]})
 
-    candidates = _build_candidates(test_data, n_items=100, num_negatives=3, seed=0)
+    candidates = build_candidates(test_data, n_items=100, num_negatives=3, seed=0)
 
     # 2 positivos (1 por usuário) + 2*3 negativos = 8 candidatos.
     assert len(candidates) == 8
