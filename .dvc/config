@@ -1,5 +1,8 @@
 [core]
     analytics = false
-    remote = localremote
+    remote = s3remote
 ['remote "localremote"']
     url = D:/tech-challenge-dvc-remote
+['remote "s3remote"']
+    url = s3://tech-challenge-dvc-primodeckers/tech-challenge
+    region = us-east-2

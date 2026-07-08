@@ -58,6 +58,19 @@ dvc repro                 # executa o pipeline completo (ou só o que mudou)
 dvc metrics show          # mostra as métricas do último run
 ```
 
+### Armazenamento remoto (S3)
+
+Dados e modelos são versionados no DVC e sincronizados com um bucket **Amazon S3**
+(`s3://tech-challenge-dvc-primodeckers/tech-challenge`, região `us-east-2`):
+
+```bash
+dvc push                  # envia dados/modelos versionados para o S3
+dvc pull                  # baixa a versão correspondente ao commit atual
+```
+
+As credenciais AWS ficam em `~/.aws/credentials` (fora do repositório); o
+`.dvc/config` versiona apenas a URL do bucket e a região — nenhum segredo.
+
 ### Resultados (@10, protocolo NCF: 1 positivo vs 99 negativos)
 
 | Métrica | MLP (rede neural) | Baseline (popularidade) |
