@@ -30,17 +30,17 @@ curl https://recomendador-api-447z.onrender.com/health
 
 # top-5 recomendações para o usuário 0
 curl "https://recomendador-api-447z.onrender.com/recomendar/0?k=5"
-# -> {"user_idx":0,"recomendacoes":[{"item_idx":1407,"score":0.9902}, ...]}
 ```
 
-Resposta do `/recomendar`:
+A resposta do `/recomendar` tem este formato (os valores abaixo são só ilustrativos —
+os itens e scores reais dependem do modelo em produção):
 
 ```json
 {
   "user_idx": 0,
   "recomendacoes": [
-    { "item_idx": 1407, "score": 0.9902 },
-    { "item_idx": 1421, "score": 0.9899 }
+    { "item_idx": 3316, "score": 0.9738 },
+    { "item_idx": 1421, "score": 0.9644 }
   ]
 }
 ```

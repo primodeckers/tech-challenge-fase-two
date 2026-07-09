@@ -1,6 +1,9 @@
 # Model Card — Recomendador de Produtos (RetailRocket)
 
-Documentação do modelo seguindo a estrutura de *Model Cards* (Mitchell et al., 2019).
+Ficha do modelo que colocamos em produção, seguindo a estrutura de *Model Cards*
+(Mitchell et al., 2019). A ideia é deixar claro, num lugar só, o que o modelo faz,
+com quais dados foi treinado, o quanto ele acerta e onde ele não deve ser usado.
+Ele está servindo na API pública: https://recomendador-api-447z.onrender.com
 
 ## Detalhes do modelo
 
