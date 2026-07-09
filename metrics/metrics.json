@@ -1,9 +1,9 @@
 {
   "mlp": {
-    "precision_at_k": 0.047854920367049886,
-    "recall_at_k": 0.4785492036704989,
-    "ndcg_at_k": 0.2739921572460792,
-    "hit_rate_at_k": 0.4785492036704989
+    "precision_at_k": 0.04862356291530429,
+    "recall_at_k": 0.4862356291530429,
+    "ndcg_at_k": 0.2779912094729751,
+    "hit_rate_at_k": 0.4862356291530429
   },
   "baseline_popularity": {
     "precision_at_k": 0.04467487606792533,

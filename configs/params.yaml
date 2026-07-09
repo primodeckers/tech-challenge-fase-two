@@ -9,7 +9,9 @@ preprocess:
   min_item_interactions: 5
 
 train:
-  embedding_dim: 32
+  # 64 foi a melhor dimensão nos experimentos (ver seção experiment); é a que
+  # o pipeline treina por padrão e a que está publicada em produção.
+  embedding_dim: 64
   learning_rate: 0.001
   epochs: 20
   patience: 3

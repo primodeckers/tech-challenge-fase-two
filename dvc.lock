@@ -99,7 +99,7 @@ stages:
     params:
       configs/params.yaml:
         train:
-          embedding_dim: 32
+          embedding_dim: 64
           learning_rate: 0.001
           epochs: 20
           patience: 3
@@ -107,11 +107,11 @@ stages:
     outs:
     - path: models/model.pt
       hash: md5
-      md5: 3b55b03be5a4733d3f5f4b6850039fc8
-      size: 18138621
+      md5: 30a56edc18a9a0e20c5050f350d4e8ac
+      size: 36273917
     - path: models/run_id.txt
       hash: md5
-      md5: 524dc748fe9aba07fb7b0a2681b8cdbc
+      md5: aa9d99385735d947166874fcf06c522e
       size: 32
   evaluate:
     cmd: python -m src.pipeline.evaluate
@@ -130,8 +130,8 @@ stages:
       size: 6962639
     - path: models/model.pt
       hash: md5
-      md5: 3b55b03be5a4733d3f5f4b6850039fc8
-      size: 18138621
+      md5: 30a56edc18a9a0e20c5050f350d4e8ac
+      size: 36273917
     - path: src/evaluation/evaluator.py
       hash: md5
       md5: b432ebddcc259b694e62a974ba8ea2a3
@@ -160,5 +160,5 @@ stages:
     outs:
     - path: metrics/metrics.json
       hash: md5
-      md5: de6c6101d7c6778ae2bdcc29a19b67bf
-      size: 385
+      md5: 9a5ea12a3729780eb4f8da1f23fff685
+      size: 384
