@@ -1,0 +1,10 @@
+# Blueprint do Render: publica a API de inferência como web service (Docker).
+# O Render injeta a variável PORT; o container escuta nela (ver Dockerfile.api).
+services:
+  - type: web
+    name: recomendador-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.api
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
