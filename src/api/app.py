@@ -37,6 +37,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Recomendador de Produtos", version="1.0.0", lifespan=lifespan)
 
 
+@app.get("/")
+def root() -> dict:
+    return {
+        "servico": "Recomendador de Produtos (e-commerce)",
+        "descricao": "API de inferência do Tech Challenge Fase 02 (rede neural PyTorch).",
+        "endpoints": {
+            "health": "/health",
+            "recomendar": "/recomendar/{user_idx}?k=10",
+            "docs": "/docs",
+        },
+    }
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "model_loaded": "model" in _state}
