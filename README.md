@@ -6,9 +6,29 @@ Sistema de recomendação de produtos para e-commerce baseado no comportamento d
 
 ## Status
 
-🚧 Em desenvolvimento — Etapas 1–4 quase completas: estrutura + clean code; Docker;
-pipeline DVC de 4 estágios + rede neural avaliada; MLflow com múltiplos runs, Model
-Registry (melhor modelo em produção) e [Model Card](MODEL_CARD.md). Pendente: vídeo.
+🚧 Em finalização — Etapas 1–4 completas: estrutura + clean code; Docker; pipeline DVC
+de 4 estágios + rede neural avaliada; MLflow com múltiplos runs, Model Registry (melhor
+modelo em produção) e [Model Card](MODEL_CARD.md); **API de inferência publicada na
+nuvem** (bônus). Pendente: vídeo.
+
+## API em produção (deploy na nuvem) 🌐
+
+A API de inferência está publicada em um web service Docker no Render, acessível por
+URL pública:
+
+**https://recomendador-api-447z.onrender.com**
+
+| Endpoint | Descrição |
+|---|---|
+| [`/health`](https://recomendador-api-447z.onrender.com/health) | status do serviço e do modelo |
+| [`/recomendar/0?k=5`](https://recomendador-api-447z.onrender.com/recomendar/0?k=5) | top-k itens recomendados para um usuário |
+| [`/docs`](https://recomendador-api-447z.onrender.com/docs) | documentação interativa (Swagger) |
+
+O deploy é automático a partir do `render.yaml` (blueprint) usando a imagem enxuta
+`Dockerfile.api`. Rodar localmente: `uvicorn src.api.app:app` ou
+`docker build -f Dockerfile.api -t recomendador-api . && docker run -p 8000:8000 recomendador-api`.
+
+> O free tier hiberna após inatividade — a primeira requisição pode levar ~50s (cold start).
 
 ## Dataset
 
