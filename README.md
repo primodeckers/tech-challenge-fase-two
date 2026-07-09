@@ -28,6 +28,8 @@ O deploy é automático a partir do `render.yaml` (blueprint) usando a imagem en
 `Dockerfile.api`. Rodar localmente: `uvicorn src.api.app:app` ou
 `docker build -f Dockerfile.api -t recomendador-api . && docker run -p 8000:8000 recomendador-api`.
 
+📖 **Uso detalhado dos endpoints (incl. como testar pelo Swagger):** [docs/API.md](docs/API.md)
+
 > O free tier hiberna após inatividade — a primeira requisição pode levar ~50s (cold start).
 
 ## Dataset
