@@ -1,0 +1,35 @@
+# Ignore específico da imagem da API (BuildKit usa <Dockerfile>.dockerignore).
+# Mantém apenas o essencial + o modelo e o metadata.json (necessários para servir).
+.git
+.github
+referencia/
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+mlruns/
+mlartifacts/
+*.db
+.env
+.env.*
+!.env.example
+notebooks/
+tests/
+scripts/
+configs/
+
+# Dados pesados: excluímos os brutos e os parquets, mas NÃO o metadata.json.
+data/raw/
+data/processed/interactions.parquet
+data/processed/train.parquet
+data/processed/val.parquet
+data/processed/test.parquet
+
+# Docker / IDE
+Dockerfile*
+docker-compose.yml
+.dockerignore
+.vscode/
+.idea/

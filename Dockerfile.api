@@ -1,0 +1,45 @@
+# syntax=docker/dockerfile:1
+# Imagem de serviço: API de inferência (FastAPI) com o modelo embutido.
+
+# ---------- Estágio de build: instala dependências ----------
+FROM python:3.12-slim AS build
+
+COPY --from=ghcr.io/astral-sh/uv:0.11.26 /uv /bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=never
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
+
+COPY src ./src
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# ---------- Estágio de runtime: API + modelo embutido ----------
+FROM python:3.12-slim AS runtime
+
+RUN groupadd --system apiuser && useradd --system --gid apiuser --create-home apiuser
+
+WORKDIR /app
+
+COPY --from=build --chown=apiuser:apiuser /app/.venv /app/.venv
+COPY --chown=apiuser:apiuser src ./src
+# Artefatos necessários para servir (modelo + metadados), embutidos na imagem.
+COPY --chown=apiuser:apiuser models/model.pt ./models/model.pt
+COPY --chown=apiuser:apiuser data/processed/metadata.json ./data/processed/metadata.json
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=8000
+
+USER apiuser
+
+EXPOSE 8000
+# O host de nuvem injeta a porta via $PORT; expomos a API publicamente.
+CMD ["sh", "-c", "uvicorn src.api.app:app --host 0.0.0.0 --port ${PORT}"]
