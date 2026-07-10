@@ -36,6 +36,9 @@ mlruns/
 mlartifacts/
 *.db
 
+# Material de trabalho do vídeo (roteiro, anotações, gravações) — não versionar
+video/
+
 # IDE / SO
 .vscode/
 .idea/
