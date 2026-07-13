@@ -1,0 +1,67 @@
+==============================================================
+ TECH CHALLENGE - FASE 02
+ Pos-Tech FIAP - Machine Learning Engineering
+ Sistema de Recomendacao de Produtos para E-commerce
+==============================================================
+
+Aluno: Rene Estevam Deckers (RM371664)
+
+
+--------------------------------------------------------------
+ ENTREGAVEIS - LINKS DE ACESSO
+--------------------------------------------------------------
+
+[1] Repositorio GitHub (codigo, pipeline e documentacao):
+    https://github.com/primodeckers/tech-challenge-fase-two
+
+[2] Video de apresentacao - formato STAR (YouTube):
+    https://youtu.be/RDWVXD1AGZE
+
+[3] API de inferencia publicada na nuvem - URL publica:
+    https://recomendador-api-447z.onrender.com
+      - GET /                       -> apresentacao e lista de endpoints
+      - GET /health                 -> status do servico e do modelo
+      - GET /recomendar/{user_idx}  -> top-k recomendacoes (ex.: /recomendar/0?k=5)
+      - GET /docs                   -> documentacao interativa (Swagger)
+
+
+--------------------------------------------------------------
+ SOBRE O PROJETO
+--------------------------------------------------------------
+
+Sistema de recomendacao de produtos de e-commerce construido de ponta a
+ponta: rede neural em PyTorch (embeddings de usuario e item, estilo Neural
+Collaborative Filtering), pipeline reprodutivel com DVC, experimentos
+rastreados no MLflow com Model Registry, containerizacao com Docker e uma
+API de inferencia publicada na nuvem.
+
+Stack: PyTorch, scikit-learn, DVC, MLflow, Docker, FastAPI, uv
+Dataset: RetailRocket (~2,7 milhoes de eventos de e-commerce)
+
+Resultados (@10) - a rede neural supera o baseline de popularidade:
+      HitRate@10 : 0,486  (baseline 0,447)
+      NDCG@10    : 0,278  (baseline 0,259)
+
+
+--------------------------------------------------------------
+ COMO ACESSAR / REPRODUZIR
+--------------------------------------------------------------
+
+- API: abra a URL publica no navegador; use /docs para testar as
+  recomendacoes. Observacao: esta hospedada em free tier, entao a
+  PRIMEIRA requisicao apos um tempo ocioso pode levar ~50s (cold start).
+
+- Reproduzir localmente (detalhes no README.md):
+      uv sync
+      dvc repro
+
+
+--------------------------------------------------------------
+ DOCUMENTACAO NO REPOSITORIO
+--------------------------------------------------------------
+
+      README.md      -> visao geral, como rodar e resultados
+      MODEL_CARD.md  -> ficha do modelo (dados, metricas, limitacoes)
+      docs/API.md    -> uso detalhado da API
+
+==============================================================
