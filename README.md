@@ -10,7 +10,11 @@ O modelo em si é uma rede neural em PyTorch (embeddings de usuário e item, no 
 Neural Collaborative Filtering). O resto — DVC, MLflow, Docker, uv — é o que faz esse
 modelo virar algo reproduzível e operável.
 
-**A API está publicada e funcionando:** https://recomendador-api-447z.onrender.com
+## Entregáveis
+
+- 🎥 **Vídeo (apresentação STAR):** https://youtu.be/RDWVXD1AGZE
+- 🌐 **API pública (modelo no ar):** https://recomendador-api-447z.onrender.com
+- 📦 **Repositório:** este repositório
 
 ## Índice rápido
 
